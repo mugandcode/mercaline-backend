@@ -32,5 +32,9 @@ public class UserEntityService extends BaseService<UserEntity, Long, UserEntityR
         return this.userEntityRepository.findById(id);
     }
 
+    public UserEntity updateUser(UserEntity user) {
+        return this.userEntityRepository.save(user);
+    }
+
 
 }

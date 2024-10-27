@@ -22,11 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.mercaline.config.utils.AppConstants.*;
-import static com.mercaline.config.utils.AppConstants.USERNAME_REGEXP_MSG;
 
-/**
- * Entidad que representa a un usuario de la aplicacion
- */
 @Entity
 @Table(name = "users")
 @Setter
@@ -35,14 +31,13 @@ import static com.mercaline.config.utils.AppConstants.USERNAME_REGEXP_MSG;
 @NoArgsConstructor
 @Builder
 public class UserEntity implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false, name = "username")
     @NotBlank(message = USERNAME_NOTBLANK_MSG)
-    @Size(min = USERNAME_MIN_SIZE, max=USERNAME_MAX_SIZE, message = USERNAME_ERRORSIZE_MSG)
+    @Size(min = USERNAME_MIN_SIZE, max = USERNAME_MAX_SIZE, message = USERNAME_ERRORSIZE_MSG)
     @Pattern(regexp = USERNAME_REGEXP, message = USERNAME_REGEXP_MSG)
     private String username;
 
@@ -59,7 +54,7 @@ public class UserEntity implements UserDetails {
     private String lastname;
 
     @Column(nullable = false, name = "password")
-    @NotBlank(message = PASSWORD_NOTBLANK_MSG)
+    @NotBlank(groups = OnCreate.class, message = PASSWORD_NOTBLANK_MSG)
     @Size(min = PASSWORD_MIN_SIZE, message = PASSWORD_MIN_SIZE_MSG)
     private String password;
 
@@ -76,6 +71,8 @@ public class UserEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
     }
-    
-}
 
+    // Interfaces para separar Crear Usuario de Modificar Usuario
+    public interface OnCreate {}
+    public interface OnUpdate {}
+}

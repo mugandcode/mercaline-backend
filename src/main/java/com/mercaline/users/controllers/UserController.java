@@ -12,26 +12,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import com.mercaline.users.Model.UserEntity;
 import com.mercaline.users.services.UserEntityService;
-
 import lombok.RequiredArgsConstructor;
-
 
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
-    
     private final UserEntityService userEntityService;
     private final ProductService productService;
     private final ProductoDTOConverter productoDTOConverter;
     private final UserDTOConverter userDTOConverter;
 
     @PostMapping("/registrar")
-    public ResponseEntity<ResponseUserSummaryDTO> createUser(@Validated @RequestBody UserEntity user) {
+    public ResponseEntity<ResponseUserSummaryDTO> createUser(@Validated(UserEntity.OnCreate.class) @RequestBody UserEntity user) {
         return ResponseEntity.ok(userDTOConverter
                 .convertToResponseUserSummaryDTO(this.userEntityService.newUser(user)));
     }
@@ -39,6 +35,25 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<ResponseUserCompleteDTO> me(@AuthenticationPrincipal UserEntity user) {
         return ResponseEntity.ok(userDTOConverter.convertToResponseUserCompleteDTO(user));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ResponseUserCompleteDTO> updateUser(@AuthenticationPrincipal UserEntity user, @Validated(UserEntity.OnUpdate.class) @RequestBody UserEntity updatedUser) {
+        if (updatedUser.getName() != null) {
+            user.setName(updatedUser.getName());
+        }
+        if (updatedUser.getLastname() != null) {
+            user.setLastname(updatedUser.getLastname());
+        }
+        if (updatedUser.getEmail() != null) {
+            user.setEmail(updatedUser.getEmail());
+        }
+        if (updatedUser.getTel() != null) {
+            user.setTel(updatedUser.getTel());
+        }
+
+        UserEntity updated = userEntityService.updateUser(user);
+        return ResponseEntity.ok(userDTOConverter.convertToResponseUserCompleteDTO(updated));
     }
 
     @DeleteMapping("/delete")
@@ -60,5 +75,4 @@ public class UserController {
                 .map(product -> productoDTOConverter.convertToGetProduct(product, product.getUser()));
         return ResponseEntity.ok().body(products);
     }
-
 }
