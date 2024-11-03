@@ -46,6 +46,11 @@ public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
     boolean exists = userEntityService.findUserByUsername(username).isPresent();
     return ResponseEntity.ok(exists);
 }
+@GetMapping("/check-email")
+public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+    boolean exists = userEntityService.findUserByEmail(email).isPresent();
+    return ResponseEntity.ok(exists);
+}
 
 
     @PutMapping("/update")
