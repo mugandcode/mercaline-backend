@@ -40,5 +40,9 @@ public class UserEntityService extends BaseService<UserEntity, Long, UserEntityR
         return this.userEntityRepository.save(user);
     }
 
+    
+    public boolean emailExists(String email) {
+        return userEntityRepository.findByEmail(email).isPresent();
+    }
 
 }

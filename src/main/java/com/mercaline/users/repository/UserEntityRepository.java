@@ -8,4 +8,5 @@ import com.mercaline.users.Model.UserEntity;
 
 public interface UserEntityRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByUsername(String name);
+    Optional<UserEntity> findByEmail(String email);
 }

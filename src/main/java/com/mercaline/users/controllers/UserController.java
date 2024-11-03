@@ -31,7 +31,8 @@ public class UserController {
     private final UserDTOConverter userDTOConverter;
 
     @PostMapping("/registrar")
-    public ResponseEntity<ResponseUserSummaryDTO> createUser(@Validated(UserEntity.OnCreate.class) @RequestBody UserEntity user) {
+    public ResponseEntity<ResponseUserSummaryDTO> createUser(
+            @Validated(UserEntity.OnCreate.class) @RequestBody UserEntity user) {
         return ResponseEntity.ok(userDTOConverter
                 .convertToResponseUserSummaryDTO(this.userEntityService.newUser(user)));
     }
@@ -40,21 +41,22 @@ public class UserController {
     public ResponseEntity<ResponseUserCompleteDTO> me(@AuthenticationPrincipal UserEntity user) {
         return ResponseEntity.ok(userDTOConverter.convertToResponseUserCompleteDTO(user));
     }
-    
-    @GetMapping("/check-username")
-public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
-    boolean exists = userEntityService.findUserByUsername(username).isPresent();
-    return ResponseEntity.ok(exists);
-}
-@GetMapping("/check-email")
-public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
-    boolean exists = userEntityService.findUserByEmail(email).isPresent();
-    return ResponseEntity.ok(exists);
-}
 
+    @GetMapping("/check-username")
+    public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
+        boolean exists = userEntityService.findUserByUsername(username).isPresent();
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        boolean exists = userEntityService.emailExists(email);
+        return ResponseEntity.ok(exists);
+    }
 
     @PutMapping("/update")
-    public ResponseEntity<ResponseUserCompleteDTO> updateUser(@AuthenticationPrincipal UserEntity user, @Validated(UserEntity.OnUpdate.class) @RequestBody UserEntity updatedUser) {
+    public ResponseEntity<ResponseUserCompleteDTO> updateUser(@AuthenticationPrincipal UserEntity user,
+            @Validated(UserEntity.OnUpdate.class) @RequestBody UserEntity updatedUser) {
         if (updatedUser.getName() != null) {
             user.setName(updatedUser.getName());
         }
@@ -79,14 +81,16 @@ public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
     }
 
     @GetMapping("/myproducts")
-    public ResponseEntity<Page<ProductResponseSummaryDTO>> myProducts(@AuthenticationPrincipal UserEntity user, Pageable pageable) {
+    public ResponseEntity<Page<ProductResponseSummaryDTO>> myProducts(@AuthenticationPrincipal UserEntity user,
+            Pageable pageable) {
         Page<ProductResponseSummaryDTO> myProducts = (this.productService.findByUser(user, pageable))
                 .map(product -> productoDTOConverter.convertToGetProduct(product, user));
         return ResponseEntity.ok().body(myProducts);
     }
 
     @GetMapping("/products")
-    public ResponseEntity<Page<ProductResponseSummaryDTO>> otherProducts(@AuthenticationPrincipal UserEntity user, Pageable pageable) {
+    public ResponseEntity<Page<ProductResponseSummaryDTO>> otherProducts(@AuthenticationPrincipal UserEntity user,
+            Pageable pageable) {
         Page<ProductResponseSummaryDTO> products = (this.productService.findOthers(user, pageable))
                 .map(product -> productoDTOConverter.convertToGetProduct(product, product.getUser()));
         return ResponseEntity.ok().body(products);
