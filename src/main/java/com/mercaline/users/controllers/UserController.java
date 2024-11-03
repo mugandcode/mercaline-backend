@@ -6,6 +6,10 @@ import com.mercaline.dto.converter.UserDTOConverter;
 import com.mercaline.service.ProductService;
 import com.mercaline.users.dto.ResponseUserCompleteDTO;
 import com.mercaline.users.dto.ResponseUserSummaryDTO;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +40,13 @@ public class UserController {
     public ResponseEntity<ResponseUserCompleteDTO> me(@AuthenticationPrincipal UserEntity user) {
         return ResponseEntity.ok(userDTOConverter.convertToResponseUserCompleteDTO(user));
     }
+    
+    @GetMapping("/check-username")
+public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
+    boolean exists = userEntityService.findUserByUsername(username).isPresent();
+    return ResponseEntity.ok(exists);
+}
+
 
     @PutMapping("/update")
     public ResponseEntity<ResponseUserCompleteDTO> updateUser(@AuthenticationPrincipal UserEntity user, @Validated(UserEntity.OnUpdate.class) @RequestBody UserEntity updatedUser) {

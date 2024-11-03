@@ -27,6 +27,10 @@ public class UserEntityService extends BaseService<UserEntity, Long, UserEntityR
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         return this.userEntityRepository.save(newUser);
 	}
+    
+    public boolean usernameExists(String username) {
+        return userEntityRepository.findByUsername(username).isPresent();
+    }
 
     public Optional<UserEntity> getUser(Long id) {
         return this.userEntityRepository.findById(id);
